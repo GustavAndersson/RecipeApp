@@ -46,5 +46,24 @@ public class RecipeService {
         return Response.ok(data).build();
 
     }
+    
+    @POST
+    @Path("recipe")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addRecipe(String body){
+        if (!recipeBean.addRecipe(body)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+    @DELETE
+    @Path("recipe/{id}")
+    public Response deleteRecipe(@PathParam("id") int id) {
+        if (!recipeBean.deleteRecipe(id)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok().build();
+    }
 
 }

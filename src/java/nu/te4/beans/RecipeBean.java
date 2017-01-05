@@ -6,13 +6,17 @@
 package nu.te4.beans;
 
 import com.mysql.jdbc.Connection;
+import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.ejb.Stateless;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import nu.te4.support.ConnectionFactory;
 
 /**
@@ -21,6 +25,7 @@ import nu.te4.support.ConnectionFactory;
  */
 @Stateless
 public class RecipeBean {
+
     public JsonArray getRecipes() {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -52,7 +57,43 @@ public class RecipeBean {
         }
         return null;
     }
+
+    public boolean addRecipe(String body) {
+        JsonReader jsonReader = Json.createReader(new StringReader(body));
+        JsonObject data = jsonReader.readObject();
+        jsonReader.close();
+        String name = data.getString("name");
+        int categori = data.getInt("categori_id");
+        String desc = data.getString("description");
+        String instruction = data.getString("instruction");
+        int picture = data.getInt("picture");
+        try {
+                Connection connection = ConnectionFactory.make("127.0.0.1");
+                PreparedStatement stmt = connection.prepareStatement("INSERT INTO recept VALUES (NULL,?,?,?,?,?)");
+                stmt.setString(1, name);
+                stmt.setInt(2, categori);
+                stmt.setString(3, desc);
+                stmt.setString(4, instruction);
+                stmt.setInt(5, picture);
+                stmt.executeUpdate();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
     
-    
-    
+    public boolean deleteRecipe(int id) {
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM recept WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            connection.close();
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Error:" +ex.getMessage());
+            
+        }
+        return false;
+    }
 }
