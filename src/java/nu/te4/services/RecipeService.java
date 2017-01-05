@@ -65,5 +65,15 @@ public class RecipeService {
         }
         return Response.ok().build();
     }
+    
+    @PUT
+    @Path("recipe")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateRecipe(String body) {
+        if (!recipeBean.updateRecipe(body)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok().build();
+    }
 
 }

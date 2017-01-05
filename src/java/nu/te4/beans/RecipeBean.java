@@ -68,20 +68,20 @@ public class RecipeBean {
         String instruction = data.getString("instruction");
         int picture = data.getInt("picture");
         try {
-                Connection connection = ConnectionFactory.make("127.0.0.1");
-                PreparedStatement stmt = connection.prepareStatement("INSERT INTO recept VALUES (NULL,?,?,?,?,?)");
-                stmt.setString(1, name);
-                stmt.setInt(2, categori);
-                stmt.setString(3, desc);
-                stmt.setString(4, instruction);
-                stmt.setInt(5, picture);
-                stmt.executeUpdate();
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO recept VALUES (NULL,?,?,?,?,?)");
+            stmt.setString(1, name);
+            stmt.setInt(2, categori);
+            stmt.setString(3, desc);
+            stmt.setString(4, instruction);
+            stmt.setInt(5, picture);
+            stmt.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-    
+    }
+
     public boolean deleteRecipe(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -91,9 +91,36 @@ public class RecipeBean {
             connection.close();
             return true;
         } catch (Exception ex) {
-            System.out.println("Error:" +ex.getMessage());
-            
+            System.out.println("Error:" + ex.getMessage());
         }
         return false;
+    }
+
+    public boolean updateRecipe(String body) {
+        JsonReader jsonReader = Json.createReader(new StringReader(body));
+        JsonObject data = jsonReader.readObject();
+        jsonReader.close();
+        int id = data.getInt("id");
+        String name = data.getString("name");
+        int categori = data.getInt("categori_id");
+        String desc = data.getString("description");
+        String instruction = data.getString("instruction");
+        int picture = data.getInt("picture");
+
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            PreparedStatement stmt = connection.prepareStatement("UPDATE recept SET name=?, categori_id=?, description=?, instruction=?, picture=? WHERE id =?");
+            stmt.setString(1, name);
+            stmt.setInt(2, categori);
+            stmt.setString(3, desc);
+            stmt.setString(4, instruction);
+            stmt.setInt(5, picture);
+            stmt.setInt(6, id);
+            stmt.executeUpdate();
+            connection.close();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
