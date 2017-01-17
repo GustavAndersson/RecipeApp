@@ -118,7 +118,10 @@ public class RecipeService {
     @POST
     @Path("recipe")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addRecipe(String body){
+    public Response addRecipe(String body, @Context HttpHeaders httpHeaders){
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
         if (!recipeBean.addRecipe(body)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -128,7 +131,10 @@ public class RecipeService {
     @POST
     @Path("add/ingredient")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addIngredient(String body){
+    public Response addIngredient(String body, @Context HttpHeaders httpHeaders){
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
         if (!recipeBean.addIngredient(body)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -138,7 +144,10 @@ public class RecipeService {
     @POST
     @Path("add/ingredientToRecipe")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addIngredientToRecipe(String body){
+    public Response addIngredientToRecipe(String body, @Context HttpHeaders httpHeaders){
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
         if (!recipeBean.addIngredientToRecipe(body)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -147,10 +156,38 @@ public class RecipeService {
     
     @DELETE
     @Path("recipe/{id}")
-    public Response deleteRecipe(@PathParam("id") int id) {
+    public Response deleteRecipe(@PathParam("id") int id, @Context HttpHeaders httpHeaders) {
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
         if (!recipeBean.deleteRecipe(id)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+        return Response.ok().build();
+    }
+    
+    @DELETE
+    @Path("ingredient/{id}")
+    public Response deleteIngredient(@PathParam("id") int id, @Context HttpHeaders httpHeaders) {
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
+        if (!recipeBean.deleteIngredient(id)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok().build();
+    }
+    
+    @DELETE
+    @Path("ingredient/{recipeID}/{ingredientID}")
+    public Response deleteIngFromRecipe(@PathParam("recipeID") int recipe_id, @PathParam("ingredientID") int ingredient_id, @Context HttpHeaders httpHeaders) {
+        if (!User.authoricate(httpHeaders)) {
+            return Response.status(401).build();
+        }
+        if (!recipeBean.deleteIngFromRecipe(recipe_id, ingredient_id)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         return Response.ok().build();
     }
     

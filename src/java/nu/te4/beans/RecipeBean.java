@@ -170,11 +170,9 @@ public class RecipeBean {
             //arraybuilder
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
             while (data.next()) {
-                int userID = data.getInt("userID");
                 String name = data.getString("name");
 
                 jsonArrayBuilder.add(Json.createObjectBuilder()
-                        .add("userID", userID)
                         .add("name", name).build());
             }
             connection.close();
@@ -236,6 +234,35 @@ public class RecipeBean {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             PreparedStatement stmt = connection.prepareStatement("DELETE FROM recept WHERE id = ?");
             stmt.setInt(1, id);
+            stmt.executeUpdate();
+            connection.close();
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Error:" + ex.getMessage());
+        }
+        return false;
+    }
+    
+    public boolean deleteIngredient(int id) {
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM ingredienser WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            connection.close();
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Error:" + ex.getMessage());
+        }
+        return false;
+    }
+    
+    public boolean deleteIngFromRecipe(int recipe_id, int ingredient_id) {
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM r_i WHERE r_i.recipe_id = ? AND r_i.ingredient_id = ?");
+            stmt.setInt(1, recipe_id);
+            stmt.setInt(2, ingredient_id);
             stmt.executeUpdate();
             connection.close();
             return true;
