@@ -21,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import nu.te4.beans.RecipeBean;
+import nu.te4.support.User;
 
 
 /**
@@ -47,11 +48,98 @@ public class RecipeService {
 
     }
     
+    @GET
+    @Path("/ingredients/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRecipeIngredients(@PathParam("id")int id) {
+        JsonArray data = recipeBean.getRecipeIngredients(id);
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+    }
+    
+    @GET
+    @Path("/recipe/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRecipe(@PathParam("id")int id) {
+        JsonArray data = recipeBean.getRecipe(id);
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+    }
+    
+    @GET
+    @Path("/categories")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCategories() {
+        JsonArray data = recipeBean.getCategories();
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+    }
+    
+        
+    @GET
+    @Path("/users")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers() {
+        JsonArray data = recipeBean.getUsers();
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+    }
+    
+    @GET
+    @Path("/recipes/cat/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRecipes_category(@PathParam("id")int id) {
+        JsonArray data = recipeBean.getRecipes_category(id);
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+
+    }
+    
     @POST
     @Path("recipe")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addRecipe(String body){
         if (!recipeBean.addRecipe(body)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+    @POST
+    @Path("add/ingredient")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addIngredient(String body){
+        if (!recipeBean.addIngredient(body)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+    @POST
+    @Path("add/ingredientToRecipe")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addIngredientToRecipe(String body){
+        if (!recipeBean.addIngredientToRecipe(body)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.status(Response.Status.CREATED).build();
@@ -75,5 +163,4 @@ public class RecipeService {
         }
         return Response.ok().build();
     }
-
 }
