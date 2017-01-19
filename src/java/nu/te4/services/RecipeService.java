@@ -49,6 +49,20 @@ public class RecipeService {
     }
     
     @GET
+    @Path("/viewRecipes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getView() {
+        JsonArray data = recipeBean.getView();
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+
+        return Response.ok(data).build();
+
+    }
+    
+    @GET
     @Path("/ingredients/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRecipeIngredients(@PathParam("id")int id) {

@@ -60,6 +60,40 @@ public class RecipeBean {
         return null;
     }
     
+    public JsonArray getView() {
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            Statement stmt = connection.createStatement();
+            String sql = "SELECT * FROM view_recipe3";
+            ResultSet data = stmt.executeQuery(sql);
+            //arraybuilder
+            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+            while (data.next()) {
+                int id = data.getInt("id");
+                String recipe = data.getString("recipe");
+                String desc = data.getString("description");
+                String instruction = data.getString("instruction");
+                String picture = data.getString("picture");
+                String category = data.getString("categori");
+                String author = data.getString("author");
+
+                jsonArrayBuilder.add(Json.createObjectBuilder()
+                        .add("id", id)
+                        .add("recipe", recipe)
+                        .add("description", desc)
+                        .add("instruction", instruction)
+                        .add("picture", picture)
+                        .add("categori", category)
+                        .add("author", author).build());
+            }
+            connection.close();
+            return jsonArrayBuilder.build();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+    
     public JsonArray getRecipeIngredients(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");

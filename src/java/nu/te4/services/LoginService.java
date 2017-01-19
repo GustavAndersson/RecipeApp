@@ -26,17 +26,16 @@ import nu.te4.support.User;
 @Path("")
 public class LoginService {
     
-    @GET
+    @POST
     @Path("login")
     public Response checkLogin(@Context HttpHeaders httpHeaders) {
         if (!User.authoricate(httpHeaders)) {
             return Response.status(401).build();
-        }
-        JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder().add("admin", true);
-        
-        return Response.ok(jsonObjectBuilder.build()).build();
+        }        
+        return Response.ok().build();
     }
     
+        
     @POST
     @Path("createUser")
     @Consumes(MediaType.APPLICATION_JSON)
