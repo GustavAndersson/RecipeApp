@@ -103,10 +103,10 @@ public class RecipeService {
     
         
     @GET
-    @Path("/users")
+    @Path("/user/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers() {
-        JsonArray data = recipeBean.getUsers();
+    public Response getUser(@PathParam("id")int id) {
+        JsonArray data = recipeBean.getUser(id);
 
         if (data == null) {
             return Response.serverError().build();
@@ -136,7 +136,7 @@ public class RecipeService {
         if (!User.authoricate(httpHeaders)) {
             return Response.status(401).build();
         }
-        if (!recipeBean.addRecipe(body)) {
+        if (!recipeBean.addRecipe(body,httpHeaders)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.status(Response.Status.CREATED).build();

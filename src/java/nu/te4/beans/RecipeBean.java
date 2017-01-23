@@ -7,16 +7,18 @@ package nu.te4.beans;
 
 import com.mysql.jdbc.Connection;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Base64;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.ws.rs.core.HttpHeaders;
 import nu.te4.support.ConnectionFactory;
 
 /**
@@ -59,7 +61,7 @@ public class RecipeBean {
         }
         return null;
     }
-    
+
     public JsonArray getView() {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -93,7 +95,7 @@ public class RecipeBean {
         }
         return null;
     }
-    
+
     public JsonArray getRecipeIngredients(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -117,12 +119,12 @@ public class RecipeBean {
         }
         return null;
     }
-    
+
     public JsonArray getRecipe(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM recept where id=" +id;
+            String sql = "SELECT * FROM recept where id=" + id;
             ResultSet data = stmt.executeQuery(sql);
             //arraybuilder
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
@@ -147,7 +149,7 @@ public class RecipeBean {
         }
         return null;
     }
-    
+
     public JsonArray getCategories() {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -171,7 +173,7 @@ public class RecipeBean {
         }
         return null;
     }
-    
+
     public JsonArray getRecipes_category(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -190,23 +192,25 @@ public class RecipeBean {
             connection.close();
             return jsonArrayBuilder.build();
         } catch (Exception ex) {
-            System.out.println("ERROR: "+ex.getMessage());
+            System.out.println("ERROR: " + ex.getMessage());
         }
         return null;
     }
-    
-    public JsonArray getUsers() {
+
+    public JsonArray getUser(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM users";
+            String sql = "SELECT userID, name from users where userID =" + id;
             ResultSet data = stmt.executeQuery(sql);
             //arraybuilder
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
             while (data.next()) {
+                int userID = data.getInt("userID");
                 String name = data.getString("name");
 
                 jsonArrayBuilder.add(Json.createObjectBuilder()
+                        .add("userID", userID)
                         .add("name", name).build());
             }
             connection.close();
@@ -217,7 +221,30 @@ public class RecipeBean {
         return null;
     }
 
-    public boolean addRecipe(String body) {
+    public boolean addRecipe(String body, HttpHeaders httpHeaders) {
+        int id = -1;
+        try {
+            List<String> authHeader = httpHeaders.getRequestHeader(HttpHeaders.AUTHORIZATION);
+            String header = authHeader.get(0);
+            header = header.substring(header.indexOf(" ") + 1);
+            byte[] decoded = Base64.getDecoder().decode(header);
+            String userPass = new String(decoded);
+            System.out.println(userPass); //Gustav:test
+            //plocka ut anv och lösenord
+            String username = userPass.substring(0, userPass.indexOf(":"));
+             Connection connection = ConnectionFactory.make("127.0.0.1");
+             Statement stmt = connection.createStatement();
+             String sql = "SELECT userID FROM users WHERE name = '"+username+"'";
+             System.out.println(sql);
+             ResultSet data  = stmt.executeQuery(sql);
+             data.next();
+             id = data.getInt("userID");
+             System.out.println(id);
+             connection.close();
+        } catch (Exception e) {
+            System.out.println("Error"+ e.getMessage());
+        }
+
         JsonReader jsonReader = Json.createReader(new StringReader(body));
         JsonObject data = jsonReader.readObject();
         jsonReader.close();
@@ -226,7 +253,7 @@ public class RecipeBean {
         String desc = data.getString("description");
         String instruction = data.getString("instruction");
         String picture = data.getString("picture");
-        int byID = data.getInt("byID");
+        //int byID = data.getInt("byID");
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             PreparedStatement stmt = connection.prepareStatement("INSERT INTO recept VALUES (NULL,?,?,?,?,?,?)");
@@ -235,14 +262,14 @@ public class RecipeBean {
             stmt.setString(3, desc);
             stmt.setString(4, instruction);
             stmt.setString(5, picture);
-            stmt.setInt(6, byID);
+            stmt.setInt(6, id);
             stmt.executeUpdate();
             return true;
         } catch (Exception e) {
             return false;
         }
     }
-    
+
     public boolean addIngredientToRecipe(String body) {
         JsonReader jsonReader = Json.createReader(new StringReader(body));
         JsonObject data = jsonReader.readObject();
@@ -276,7 +303,7 @@ public class RecipeBean {
         }
         return false;
     }
-    
+
     public boolean deleteIngredient(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -290,7 +317,7 @@ public class RecipeBean {
         }
         return false;
     }
-    
+
     public boolean deleteIngFromRecipe(int recipe_id, int ingredient_id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -317,7 +344,7 @@ public class RecipeBean {
         String instruction = data.getString("instruction");
         String picture = data.getString("picture");
         int byID = data.getInt("byID");
-        
+
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             PreparedStatement stmt = connection.prepareStatement("UPDATE recept SET name=?, categori_id=?, description=?, instruction=?, picture=?, byID=? WHERE id =?");
