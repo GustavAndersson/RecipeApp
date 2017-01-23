@@ -196,6 +196,7 @@ public class RecipeBean {
         }
         return null;
     }
+    
 
     public JsonArray getUser(int id) {
         try {
@@ -378,5 +379,38 @@ public class RecipeBean {
             return false;
         }
     }
+
+    public JsonArray getViewRecipe(int id) {
+        try {
+            Connection connection = ConnectionFactory.make("127.0.0.1");
+            Statement stmt = connection.createStatement();
+            String sql = "SELECT * FROM view_recipe3 where id=" + id;
+            ResultSet data = stmt.executeQuery(sql);
+            //arraybuilder
+            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+            while (data.next()) {
+                String name = data.getString("recipe");
+                String description = data.getString("description");
+                String instruction = data.getString("instruction");
+                String picture = data.getString("picture");
+                String categori = data.getString("categori");
+                String author = data.getString("author");
+
+                jsonArrayBuilder.add(Json.createObjectBuilder()
+                        .add("name", name)
+                        .add("description", description)
+                        .add("instruction", instruction)
+                        .add("picture", picture)
+                        .add("categori", categori)
+                        .add("author", author).build());
+            }
+            connection.close();
+            return jsonArrayBuilder.build();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+    
 
 }
