@@ -63,6 +63,19 @@ public class RecipeService {
     }
     
     @GET
+    @Path("/ingredients")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIngredients() {
+        JsonArray data = recipeBean.getIngredients();
+
+        if (data == null) {
+            return Response.serverError().build();
+        }
+        return Response.ok(data).build();
+
+    }
+    
+    @GET
     @Path("/ingredients/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRecipeIngredients(@PathParam("id")int id) {
