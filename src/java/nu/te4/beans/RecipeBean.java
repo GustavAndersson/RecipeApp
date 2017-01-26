@@ -109,28 +109,30 @@ public class RecipeBean {
         }
         return null;
     }
-
-    public JsonArray getRecipe(int id) {
+    
+    public JsonArray getViewRecipe(int id) {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
             Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM recept where id=" + id;
+            String sql = "SELECT * FROM view_recipe3 where id=" + id;
             ResultSet data = stmt.executeQuery(sql);
             //arraybuilder
             JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
             while (data.next()) {
-                String name = data.getString("name");
+                String name = data.getString("recipe");
                 String description = data.getString("description");
                 String instruction = data.getString("instruction");
                 String picture = data.getString("picture");
-                int byID = data.getInt("byID");
+                String categori = data.getString("categori");
+                String author = data.getString("author");
 
                 jsonArrayBuilder.add(Json.createObjectBuilder()
                         .add("name", name)
                         .add("description", description)
                         .add("instruction", instruction)
                         .add("picture", picture)
-                        .add("byID", byID).build());
+                        .add("categori", categori)
+                        .add("author", author).build());
             }
             connection.close();
             return jsonArrayBuilder.build();
@@ -206,7 +208,6 @@ public class RecipeBean {
             ResultSet data = stmt.executeQuery(sql);
             data.next();
             id = data.getInt("userID");
-
             connection.close();
         } catch (Exception e) {
             System.out.println("Error" + e.getMessage());
@@ -231,6 +232,7 @@ public class RecipeBean {
             stmt.setString(5, picture);
             stmt.setInt(6, id);
             stmt.executeUpdate();
+            connection.close();
             return true;
         } catch (Exception e) {
             System.out.println("Error:"+e.getMessage());
@@ -248,7 +250,6 @@ public class RecipeBean {
             ResultSet data = stmt.executeQuery(sql);
             data.next();
             id = data.getInt("MAX(id)");
-
             connection.close();
         } catch (Exception e) {
             System.out.println("Error" + e.getMessage());
@@ -269,6 +270,7 @@ public class RecipeBean {
             stmt.setString(2, amount);
             stmt.setInt(3, ingredient_id);
             stmt.executeUpdate();
+            connection.close();
             return true;
         } catch (Exception e) {
             return false;
@@ -346,54 +348,6 @@ public class RecipeBean {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    public boolean addIngredient(String body) {
-        JsonReader jsonReader = Json.createReader(new StringReader(body));
-        JsonObject data = jsonReader.readObject();
-        jsonReader.close();
-        String name = data.getString("name");
-        try {
-            Connection connection = ConnectionFactory.make("127.0.0.1");
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO ingredienser VALUES (NULL,?)");
-            stmt.setString(1, name);
-            stmt.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public JsonArray getViewRecipe(int id) {
-        try {
-            Connection connection = ConnectionFactory.make("127.0.0.1");
-            Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM view_recipe3 where id=" + id;
-            ResultSet data = stmt.executeQuery(sql);
-            //arraybuilder
-            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-            while (data.next()) {
-                String name = data.getString("recipe");
-                String description = data.getString("description");
-                String instruction = data.getString("instruction");
-                String picture = data.getString("picture");
-                String categori = data.getString("categori");
-                String author = data.getString("author");
-
-                jsonArrayBuilder.add(Json.createObjectBuilder()
-                        .add("name", name)
-                        .add("description", description)
-                        .add("instruction", instruction)
-                        .add("picture", picture)
-                        .add("categori", categori)
-                        .add("author", author).build());
-            }
-            connection.close();
-            return jsonArrayBuilder.build();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        return null;
     }
 
 }

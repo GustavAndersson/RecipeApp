@@ -75,19 +75,6 @@ public class RecipeService {
     }
     
     @GET
-    @Path("/recipe/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getRecipe(@PathParam("id")int id) {
-        JsonArray data = recipeBean.getRecipe(id);
-
-        if (data == null) {
-            return Response.serverError().build();
-        }
-
-        return Response.ok(data).build();
-    }
-    
-    @GET
     @Path("/viewRecipe/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getViewRecipe(@PathParam("id")int id) {
@@ -136,19 +123,6 @@ public class RecipeService {
             return Response.status(401).build();
         }
         if (!recipeBean.addRecipe(body,httpHeaders)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-        return Response.status(Response.Status.CREATED).build();
-    }
-    
-    @POST
-    @Path("add/ingredient")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addIngredient(String body, @Context HttpHeaders httpHeaders){
-        if (!User.authoricate(httpHeaders)) {
-            return Response.status(401).build();
-        }
-        if (!recipeBean.addIngredient(body)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.status(Response.Status.CREATED).build();
