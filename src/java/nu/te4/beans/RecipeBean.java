@@ -28,40 +28,6 @@ import nu.te4.support.ConnectionFactory;
 @Stateless
 public class RecipeBean {
 
-    public JsonArray getRecipes() {
-        try {
-            Connection connection = ConnectionFactory.make("127.0.0.1");
-            Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM recept";
-            ResultSet data = stmt.executeQuery(sql);
-            //arraybuilder
-            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-            while (data.next()) {
-                int id = data.getInt("id");
-                String name = data.getString("name");
-                int categori = data.getInt("categori_id");
-                String desc = data.getString("description");
-                String instruction = data.getString("instruction");
-                String picture = data.getString("picture");
-                int byID = data.getInt("byID");
-
-                jsonArrayBuilder.add(Json.createObjectBuilder()
-                        .add("id", id)
-                        .add("name", name)
-                        .add("categori_id", categori)
-                        .add("description", desc)
-                        .add("instruction", instruction)
-                        .add("picture", picture)
-                        .add("byID", byID).build());
-            }
-            connection.close();
-            return jsonArrayBuilder.build();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        return null;
-    }
-
     public JsonArray getView() {
         try {
             Connection connection = ConnectionFactory.make("127.0.0.1");
@@ -194,29 +160,6 @@ public class RecipeBean {
             return jsonArrayBuilder.build();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-        }
-        return null;
-    }
-
-    public JsonArray getRecipes_category(int id) {
-        try {
-            Connection connection = ConnectionFactory.make("127.0.0.1");
-            String sql = "select recept.name from recept where recept.categori_id=(select categori.id from categori where id = ?)";
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setInt(1, id);
-            ResultSet data = stmt.executeQuery();
-            //arraybuilder
-            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-            while (data.next()) {
-                String name = data.getString("name");
-
-                jsonArrayBuilder.add(Json.createObjectBuilder()
-                        .add("name", name).build());
-            }
-            connection.close();
-            return jsonArrayBuilder.build();
-        } catch (Exception ex) {
-            System.out.println("ERROR: " + ex.getMessage());
         }
         return null;
     }

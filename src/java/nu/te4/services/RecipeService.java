@@ -33,20 +33,6 @@ public class RecipeService {
 
     @EJB
     RecipeBean recipeBean;
-
-    @GET
-    @Path("/recipes")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getRecipes() {
-        JsonArray data = recipeBean.getRecipes();
-
-        if (data == null) {
-            return Response.serverError().build();
-        }
-
-        return Response.ok(data).build();
-
-    }
     
     @GET
     @Path("/viewRecipes")
@@ -140,20 +126,6 @@ public class RecipeService {
         }
 
         return Response.ok(data).build();
-    }
-    
-    @GET
-    @Path("/recipes/cat/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getRecipes_category(@PathParam("id")int id) {
-        JsonArray data = recipeBean.getRecipes_category(id);
-
-        if (data == null) {
-            return Response.serverError().build();
-        }
-
-        return Response.ok(data).build();
-
     }
     
     @POST
